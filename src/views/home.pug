@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Document
+    body 
+        header
+            h1 Noom
+        main
+            form#nick
+                input(type="text", placeholder="save nickname", required)  
+                button Save
+            ul
+            form#message
+                input(type="text", placeholder="send message", required)  
+                button Send
+        script(src="/public/js/app.js")
