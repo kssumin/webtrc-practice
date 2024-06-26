@@ -19,18 +19,19 @@ const wsServer = new Server(httpServer);
 wsServer.on("connection", (socket) => {
     socket.on("join_room", (roomName) => {
         socket.join(roomName);
+        // 기존에 room에 있던 user들에게 socket.id에 해당하는 user가 들어왔다고 welcome event발생
         socket.to(roomName).emit("welcome", socket.id);
     });
 
-    socket.on("offer", (offer, roomName, remoteSocketId) => {
-        socket.to(remoteSocketId).emit("offer", offer, socket.id);
+    socket.on("offer", (offer, joinSocketId) => {
+        socket.to(joinSocketId).emit("offer", offer, socket.id);
     });
 
-    socket.on("answer", (answer, roomName, remoteSocketId) => {
+    socket.on("answer", (answer, remoteSocketId) => {
         socket.to(remoteSocketId).emit("answer", answer, socket.id);
     });
 
-    socket.on("ice", (ice, roomName, remoteSocketId) => {
+    socket.on("ice", (ice, remoteSocketId) => {
         socket.to(remoteSocketId).emit("ice", ice, socket.id);
     });
 

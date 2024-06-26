@@ -10,7 +10,7 @@ let myStream;
 let muted = false;
 let cameraOff = false;
 let roomName;
-let peerConnections = {};  // 각 피어의 RTCPeerConnection을 저장할 객체
+let peerConnections = {};
 
 async function getCameras() {
     try {
@@ -119,22 +119,25 @@ async function handleWelcomeSubmit(event) {
 
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
-socket.on("welcome", async (socketId) => {
-    const peerConnection = createPeerConnection(socketId);
+// 원래 room에 있던 user들이 welcome event를 받는다
+socket.on("welcome", async (joinSocketId) => {
+    const peerConnection = createPeerConnection(joinSocketId);
+    // 원래 room에 있던 user들이 본인의 sdp를 생성한다
     const offer = await peerConnection.createOffer();
     peerConnection.setLocalDescription(offer);
 
-    socket.emit("offer", offer, roomName, socketId);
+    // 기존에 room에 있던 user들이 본인의 sdp를 새로 들어온 user의 socketId에게 전달한다
+    socket.emit("offer", offer, joinSocketId);
 });
 
 socket.on("offer", async (offer, socketId) => {
     const peerConnection = createPeerConnection(socketId);
-    await peerConnection.setRemoteDescription(offer);
 
+    await peerConnection.setRemoteDescription(offer);
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
 
-    socket.emit("answer", answer, roomName, socketId);
+    socket.emit("answer", answer, socketId);
 });
 
 socket.on("answer", (answer, socketId) => {
